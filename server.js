@@ -67,8 +67,12 @@ var SampleApp = function() {
             res.send(self.cache_get('index.html') );
         };
         
-        self.routes['duke_home_feed'] = function(req,res) {
+        self.routes['/duke_home_feed'] = function(req,res) {
             res.send('duke!');   
+        }
+        
+        self.routes['/test'] = function(req,res) {
+            res.send('duke_test!');   
         }
     };
 
