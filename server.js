@@ -3,6 +3,8 @@
 var express = require('express');
 var fs      = require('fs');
 
+var feedRouter = require('./Resources/FeedRouter');
+
 
 var SampleApp = function() {
 
@@ -68,17 +70,18 @@ var SampleApp = function() {
         };
         
         self.routes['/duke_home_feed'] = function(req,res) {
-            res.send('duke!');   
+            feedRouter.routeDuke(req,res);  
         }
         
-        self.routes['/test'] = function(req,res) {
-            res.send('duke_test!');   
+        self.routes['/duke_home_feed_web'] = function(req,res) {
+            feedRouter.routeDuke(req,res);  
         }
     };
 
     self.initializeServer = function() {
         self.createRoutes();
         self.app = express.createServer();
+        self.app.use('/Resources', express.static(__dirname+'/Resources')); //Add static folder
 
         for (var r in self.routes) {
             self.app.get(r, self.routes[r]);
