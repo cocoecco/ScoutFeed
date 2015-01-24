@@ -4,6 +4,27 @@ var htmlparser = require("htmlparser2");
 var request = require('request');
 var async = require("async");
 
+var feedsReceived = 0;
+var feedsDB = [];
+
+
+function collectFeeds(req,res, feeds) {
+    
+    feedsDB.push.apply(feedsDB, feeds);
+    feedsReceived++;
+    
+    if (feedsReceived < 2) {
+        //need to get basketball feeds then send 
+        request('http://duke.scout.com/a.z?s=167&p=4&cfg=bb', function (error, response, body) {
+            if (!error && response.statusCode == 200) {
+            processHomePage(req,res,body);
+        }
+        })
+    }
+    else {
+        res.send(feedsDB);
+    }
+}
 
 function processHomePage(req,res,body) {
     
@@ -117,7 +138,7 @@ function processHomePage(req,res,body) {
         //------------------------------------------  
     }
     
-    res.send(stories);
+    collectFeeds(req,res,stories);
 }
 
 function getAppHomePage(req,res) {
