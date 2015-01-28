@@ -7,6 +7,11 @@ var async = require("async");
 var feedsReceived = 0;
 var feedsDB = [];
 
+function clearFeedsDB() {
+    feedsReceived = 0;
+    feedsDB = []; 
+}
+exports.clearFeedsDB = clearFeedsDB;
 
 function collectFeeds(req,res, feeds) {
     
@@ -22,6 +27,7 @@ function collectFeeds(req,res, feeds) {
         })
     }
     else {
+        console.log(feedsDB.length);
         res.send(feedsDB);
     }
 }
