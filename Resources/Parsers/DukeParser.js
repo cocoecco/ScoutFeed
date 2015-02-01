@@ -202,10 +202,7 @@ function getDukeData(req,res) {
     }
     else if (queryData.section == "story") {
         var storyID = queryData.storyurl;
-        var storyURL = "http://cdn-api.scout.com//content/stories/" + storyID;
-        console.log(storyURL);
-        
-        //storyURL = "http://cdn-api.scout.com//content/stories/1507261"; //http://cdn-api.scout.com//content/stories/1507249
+        var storyURL = "http://cdn-api.scout.com//content/stories/" + storyID;        
         getStoryWithURL(req,res,storyURL);
     }
     else {
