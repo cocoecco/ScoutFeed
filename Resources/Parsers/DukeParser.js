@@ -173,6 +173,7 @@ function processStory(req,res,storyPage) {
     var storySubtitle = storyJSON["subtitle"]; //mostly unused in the story, sometimes same as headline (deck)
     var storyHeadline = storyJSON["deck"];
     var storyBody = storyJSON["body"];
+    var storyDate = storyJSON["createdOn"];
     var storyImageLink = queryData.storyimgsrc; //make sure to send this in the request
     
     var story = {};
@@ -181,6 +182,7 @@ function processStory(req,res,storyPage) {
     story["storyHeadline"] = storyHeadline;
     story["storyBody"] = storyBody;
     story["storyImageLink"] = storyImageLink;
+    story["storyDate"] = storyDate;
 
     res.send(story);
 }
