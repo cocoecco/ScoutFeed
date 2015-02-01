@@ -64,6 +64,14 @@ function processHomePage(req,res,body) {
         var storyLink = storiesDiv.substring(0,linkEndIndex);
         //End Story Link****************************************
         
+        
+        //Story ID *********************************************
+        var storyKeyPrefix = "story/"
+        var storyID = storyLink.substring(storyLink.indexOf(storyKeyPrefix));
+        storyID = storyID.substring(storyKeyPrefix.length);
+        storyID = storyID.substring(0,storyID.indexOf("-"));
+        //End Story ID *****************************************
+
         storiesDiv = storiesDiv.substring(linkEndIndex);
         storiesDiv = storiesDiv.substring(linkEndPrefix.length);
 
@@ -127,7 +135,8 @@ function processHomePage(req,res,body) {
             "StoryWrite" : storyWriter,
             "StoryDate" : storyDate,
             "StoryText" : storyText,
-            "ImageURL": imgURL
+            "ImageURL": imgURL,
+            "storyID": storyID
             }
             stories.push(story);
         }
@@ -155,11 +164,49 @@ function getAppHomePage(req,res) {
     })
 }
 
+
+function processStory(req,res,storyPage) {
+    
+    var storyJSON = JSON.parse(storyPage);
+    var storyTitle = storyJSON["title"];
+    var storySubtitle = storyJSON["subtitle"]; //mostly unused in the story, sometimes same as headline (deck)
+    var storyHeadline = storyJSON["deck"];
+    var storyBody = storyJSON["body"];
+    var storyImageLink = req.storyimgsrc; //make sure to send this in the request
+    
+    var story = {};
+    story["storyTitle"] = storyTitle;
+    story["storySubtitle"] = storySubtitle;
+    story["storyHeadline"] = storyHeadline;
+    story["storyBody"] = storyBody;
+    story["storyImageLink"] = storyImageLink;
+
+    res.send(story);
+}
+
+function getStoryWithURL(req,res,storyURL) {
+    request(storyURL, function (error, response, body) {
+    if (!error && response.statusCode == 200) {
+        processStory(req,res,body);
+    }
+    })
+    
+}
+
+
 function getDukeData(req,res) {
     var queryData = url.parse(req.url, true).query; //Parse the URL Request Data Components
     
     if (queryData.section == "homepage") {
         getAppHomePage(req,res);
+    }
+    else if (queryData.section == "story") {
+        var storyID = queryData.storyurl;
+        var storyURL = "http://cdn-api.scout.com//content/stories/" + storyID;
+        console.log(storyURL);
+        
+        //storyURL = "http://cdn-api.scout.com//content/stories/1507261"; //http://cdn-api.scout.com//content/stories/1507249
+        getStoryWithURL(req,res,storyURL);
     }
     else {
         res.send('no section');   
