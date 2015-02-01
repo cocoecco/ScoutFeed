@@ -166,13 +166,14 @@ function getAppHomePage(req,res) {
 
 
 function processStory(req,res,storyPage) {
-    
+    var queryData = url.parse(req.url, true).query; //Parse the URL Request Data Components
+
     var storyJSON = JSON.parse(storyPage);
     var storyTitle = storyJSON["title"];
     var storySubtitle = storyJSON["subtitle"]; //mostly unused in the story, sometimes same as headline (deck)
     var storyHeadline = storyJSON["deck"];
     var storyBody = storyJSON["body"];
-    var storyImageLink = req.storyimgsrc; //make sure to send this in the request
+    var storyImageLink = queryData.storyimgsrc; //make sure to send this in the request
     
     var story = {};
     story["storyTitle"] = storyTitle;
