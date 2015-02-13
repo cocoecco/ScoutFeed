@@ -193,7 +193,15 @@ function getStoryWithURL(req,res,storyURL) {
         processStory(req,res,body);
     }
     })
-    
+}
+
+
+function getStoriesList(req,res,url) {
+    request(url, function (error, response, body) {
+    if (!error && response.statusCode == 200) {
+        res.send(body);
+    }
+    }) 
 }
 
 
@@ -208,8 +216,24 @@ function getDukeData(req,res) {
         var storyURL = "http://cdn-api.scout.com//content/stories/" + storyID;        
         getStoryWithURL(req,res,storyURL);
     }
+    else if (queryData.section == "recruiting") {
+        var recType = queryData.rectype;
+        if (recType == "FB") {
+            var url = "http://duke.scout.com/a.z?s=167&p=4&cfg=fbrec";
+            getStoriesList(req,res,url);
+        }
+        else {
+            var url = "http://duke.scout.com/a.z?s=167&p=4&cfg=bbrec";
+            getStoriesList(req,res,url);   
+        }
+    }
     else {
         res.send('no section');   
     }
 }
 exports.getDukeData = getDukeData;
+
+
+
+
+
