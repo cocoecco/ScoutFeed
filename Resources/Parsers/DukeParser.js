@@ -357,6 +357,77 @@ function getRecruitingStoriesList(req,res,url) {
 
 
 
+//-------- FB AND BB COMMITS GETTER --------------
+//************************************************
+
+
+
+
+function processCommits(req,res,commitsBody) {
+    var commitsJSON = JSON.parse(commitsBody);
+    var searchResultsDB = commitsJSON["searchResults"];
+    var resultsDB = searchResultsDB["results"];
+
+    var commitsDB = [];
+    for (var i=0;i<resultsDB.length;i++) {
+        var commitItem = resultsDB[i];
+        
+        var parsedItem = {};
+        var playerName = commitItem["name"]; //Player Name *********************************************
+        
+        var playerPhotoURL = commitItem["primaryPhotoId"];
+        if (playerPhotoURL != null) {
+            if (playerPhotoURL.length > 0) {
+                var imgFolder = playerPhotoURL.substr(0,3);
+                var tempPhotoURL = "http://imgix.scout.com/" + imgFolder + "/" + playerPhotoURL + ".jpg";
+                playerPhotoURL = tempPhotoURL; //Full Player Photo Url *********************************
+            }    
+        }
+        else {
+            var playerPhotoURL = "";   
+        }
+
+        var playerYearsArray = commitItem["playerYears"];
+        var playerYear = playerYearsArray[0];
+        var playerTeam = playerYear["currentTeamName"]; //Player Commit Team ***************************
+        
+        var playerRating = playerYear["rating"]; //Player Rating ***************************************
+        
+        var positionsDB = playerYear["positions"];
+        var positionItem = positionsDB[0];
+        var playerPosition = positionItem["abbreviation"]; //Player Position ***************************
+        
+        var schoolsDB = playerYear["schoolsOfInterest"];
+        var commitSchool = schoolsDB[0];
+        var commitDate = commitSchool["verbalCommitDate"]; //Player Commit Date ************************
+        
+        parsedItem["playerName"] = playerName;
+        parsedItem["playerPhotoURL"] = playerPhotoURL;
+        parsedItem["playerTeam"] = playerTeam;
+        parsedItem["playerRating"] = playerRating;
+        parsedItem["playerPosition"] = playerPosition;
+        parsedItem["commitDate"] = commitDate;
+
+        commitsDB.push(parsedItem);
+    }
+    
+    res.send(commitsDB);
+}
+
+
+function getCommitsForURL(req,res,url) {
+    request(url, function (error, response, body) {
+    if (!error && response.statusCode == 200) {
+        //processRecruitingPage(req,res,body);
+        processCommits(req,res,body);
+    }
+    })
+}
+
+
+//************************************************
+
+
 
 //-------- PUBLIC ROUTER --------------------------
 //*************************************************
@@ -383,6 +454,19 @@ function getDukeData(req,res) {
             getRecruitingStoriesList(req,res,bbURL);   
         }
     }
+    else if (queryData.section == "commits") {
+        var comType = queryData.comtype;
+        if (comType == "FB") {
+            var fbURL = "http://api.scout.com//topic/players/search?from=0&size=25&sortBy=CommitDate&viewType=players&category=Football+Recruiting&classYear=2016&team=Duke&minimumInterest=SoftVerbal&hasOffer=&hasVisit=&visit=";
+            getCommitsForURL(req,res,fbURL);
+        }
+        else {
+            var bbURL = "http://api.scout.com//topic/players/search?from=0&size=25&sortBy=CommitDate&viewType=players&category=Basketball+Recruiting&classYear=2015&team=Duke&minimumInterest=SoftVerbal&hasOffer=&hasVisit=&visit=";
+            getCommitsForURL(req,res,bbURL);   
+        }
+    }
+    
+    
     else {
         res.send('no section');   
     }
