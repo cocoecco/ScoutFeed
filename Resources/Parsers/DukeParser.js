@@ -179,6 +179,7 @@ function getAppHomePage(req,res) {
 function processStory(req,res,storyPage) {
     var queryData = url.parse(req.url, true).query; //Parse the URL Request Data Components
 
+    
     var storyJSON = JSON.parse(storyPage);
     var storyTitle = storyJSON["title"];
     var storySubtitle = storyJSON["subtitle"]; //mostly unused in the story, sometimes same as headline (deck)
@@ -186,7 +187,7 @@ function processStory(req,res,storyPage) {
     var storyBody = storyJSON["body"];
     var storyDate = storyJSON["createdOn"];
     var storyImageLink = queryData.storyimgsrc; //make sure to send this in the request
-    
+    var isPremium = storyJSON["isPremium"];
     var story = {};
     story["storyTitle"] = storyTitle;
     story["storySubtitle"] = storySubtitle;
@@ -194,7 +195,7 @@ function processStory(req,res,storyPage) {
     story["storyBody"] = storyBody;
     story["storyImageLink"] = storyImageLink;
     story["storyDate"] = storyDate;
-
+    story["isPremium"] = isPremium;
     res.send(story);
 }
 
@@ -429,6 +430,29 @@ function getCommitsForURL(req,res,url) {
 
 
 
+//-------- SCHEDULES - FB & BB -------------------
+//*************************************************
+
+function getSchedulesFor(req,res,type) {
+    var schedURL = "http://duke.scout.com/3/fbschedule.html";
+    if (type == "fb") {
+        schedURL = "http://duke.scout.com/3/fbschedule.html";   
+    }
+    else {
+        schedURL = "http://duke.scout.com/3/bbschedule.html";   
+    }
+    
+    request(schedURL, function (error, response, body) {
+    if (!error && response.statusCode == 200) {
+        res.send(body);
+    }
+    })
+}
+
+
+//*************************************************
+
+
 //-------- PUBLIC ROUTER --------------------------
 //*************************************************
 
@@ -465,7 +489,10 @@ function getDukeData(req,res) {
             getCommitsForURL(req,res,bbURL);   
         }
     }
-    
+    else if (queryData.section == "sched") {
+        var schedType = queryData.schedtype;
+        getSchedulesFor(req,res,schedType);
+    }
     
     else {
         res.send('no section');   
